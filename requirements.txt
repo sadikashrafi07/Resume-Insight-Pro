@@ -1,0 +1,12 @@
+streamlit
+streamlit-option-menu
+python-dotenv
+Pillow
+pdf2image
+google-generativeai
+crewai
+crewai_tools
+load_dotenv
+langchain-huggingface
+huggingface_hub
+PyPDF2

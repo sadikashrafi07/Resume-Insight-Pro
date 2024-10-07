@@ -1,0 +1,261 @@
+[data-testid="stSidebar"] .nav-item a {
+    color: #0ef !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 1px solid #0ef !important;
+    border-radius: 5px;
+    margin: 5px 0;
+    padding: 10px 15px;
+}
+[data-testid="stSidebar"] .nav-item a:hover {
+    color: #0ef !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 1px solid #0ef !important;
+}
+[data-testid="stSidebar"] .nav-item .nav-link.active {
+    color: #0ef !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: 1px solid #0ef !important;
+}
+
+.sidebar-image-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1px;
+    margin-bottom: 10px;
+}
+.sidebar-image {
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    object-position: 70% 25%;
+}
+.sidebar-header {
+    text-align: left;
+    color: #0ef;
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+.sidebar-header .first-line,
+.sidebar-header .second-line,
+.sidebar-header .third-line {
+    padding-left: 10px;
+    margin: 0;
+}
+.sidebar-header .first-line {
+    font-size: 1rem;
+    font-weight: normal;
+}
+.sidebar-header .second-line {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-top: -18px;
+}
+.sidebar-header .third-line {
+    font-size: 1rem;
+    font-weight: normal;
+    color: #FFFFFF;
+    margin-top: -18px;
+}
+
+.sidebar-header .typed-text, .typed-cursor {
+    color: #0ef; /* Set the color of the typed text and cursor */
+}
+
+.contact {
+    padding: 2rem 1rem;
+    background-color: #323946;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 230, 230, 0.5);
+    max-width: 600px;
+    margin: auto;
+}
+.contact h2 {
+    margin-bottom: 1.5rem;
+    color: #FFFFFF;
+    text-align: center;
+}
+.contact h2 span {
+    color: #00e6e6;
+}
+.contact form {
+    max-width: 100%;
+    margin: auto;
+    text-align: center;
+}
+.contact form .input-box {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.contact form .input-box input,
+.contact form textarea {
+    width: calc(50% - 0.5rem);
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    color: #FFFFFF;
+    background: #2c2c2c;
+    border: none;
+    border-radius: 0.6rem;
+    margin: 0.5rem 0;
+    outline: none;
+}
+.contact form .input-box input:focus,
+.contact form textarea:focus {
+    box-shadow: 0 0 10px #00e6e6;
+}
+.contact form textarea {
+    width: 100%;
+    resize: none;
+}
+.contact form .btn {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #00e6e6;
+    color: #000;
+    border: none;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.contact form .btn:hover {
+    background-color: #009999;
+}
+
+.thank-you {
+    text-align: center;
+    background-color: #323946;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 230, 230, 0.5);
+    max-width: 600px;
+    margin: auto;
+    color: #fff;
+}
+.thank-you img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 1rem;
+}
+.thank-you a {
+    color: #00e6e6;
+}
+
+.social-media {
+    display: flex;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    margin-top: -27px; /* Adjusted margin for better spacing */
+    margin-bottom: 20px; 
+    padding-left: 20px;
+}
+
+.social-media a {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 17px;
+    background-color: rgba(0, 0, 0, 0);
+    color: #0ef;
+    font-size: 14px;
+    border: 2px solid #0ef;
+    border-radius: 50%;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.social-media a:hover {
+    background-color: #0ef;
+    color: #000;
+    border-color: #0ef;
+}
+
+.social-media a .bx {
+    vertical-align: middle;
+}
+
+.footer {
+    width: 100%;
+    background: #323946;
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: space-between; /* Space between text and icon */
+    padding: 0 20px; /* Adjust padding as needed */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 50px; /* Set a fixed height */
+}
+
+.footer-text {
+    font-size: 1.0rem;
+    color: #fff;
+    margin: 0;
+    text-align: center;
+    flex: 1; /* Allow text to grow */
+    display: flex;
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    padding-right: 60px; /* Adjust padding to make room for the icon */
+}
+
+.footer-text p {
+    margin: 0;
+}
+
+.footer-iconTop {
+    display: flex;
+    justify-content: flex-end; /* Align icon to the right end */
+    align-items: center; /* Center icon vertically */
+    height: 100%;
+    position: absolute;
+    right: 20px; /* Adjust based on overall padding */
+}
+
+.footer-iconTop a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: .6rem;
+    background: #0ef;
+    border-radius: .7rem;
+    transition: .5s ease;
+    text-decoration: none;
+    width: 40px; /* Adjust width */
+    height: 25px; /* Adjust height */
+}
+
+.footer-iconTop a:hover {
+    box-shadow: 0 0 1rem #0ef;
+}
+
+.footer-iconTop a i {
+    font-size: 1.2rem; /* Adjust icon size */
+    color: #323946;
+}
+
+.field.error .item {
+    border-color: #d93025;
+    color: #d93025;
+}
+
+.field .error-text {
+    font-size: 14.5px;
+    color: #d93025;
+    text-align: left;
+    margin: -5px 0 10px;
+    display: none;
+}
+
+.field.error .error-text {
+    display: block;
+}
+
+form .textarea-field .item {
+    resize: none;
+}
+
+form .textarea-field .error-text {
+    margin-top: -10px;
+}
