@@ -10,3 +10,4 @@ load_dotenv
 langchain-huggingface
 huggingface_hub
 PyPDF2
+gradio
