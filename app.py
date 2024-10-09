@@ -1,6 +1,5 @@
 import streamlit as st
 from chatbot import chatBot
-from search_bar import search_bar, process_query
 from streamlit_option_menu import option_menu
 from dotenv import load_dotenv
 import base64
@@ -10,11 +9,13 @@ from PIL import Image
 import pdf2image
 import google.generativeai as genai
 import time
+import asyncio
+import logging
 
 # Streamlit App configuration
 st.set_page_config(page_title="ATS Resume Expert", layout="wide")
 
-# Initialize session state for various purposes
+# Initialize session state
 if 'submit_contact_form' not in st.session_state:
     st.session_state.submit_contact_form = False
 
@@ -30,8 +31,20 @@ if 'message_time' not in st.session_state:
 if 'search_query' not in st.session_state:
     st.session_state.search_query = ""
 
+if 'search_history' not in st.session_state:
+    st.session_state.search_history = []
+
+if 'resume_count' not in st.session_state:
+    st.session_state.resume_count = 0
+
+if 'total_analysis_time' not in st.session_state:
+    st.session_state.total_analysis_time = 0
+
 # Load environment variables
 load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Utility Functions
 
@@ -79,25 +92,38 @@ def input_pdf_setup(uploaded_file):
     else:
         raise FileNotFoundError("No file uploaded")
 
-def get_gemini_response(input_text, pdf_content, prompt):
-    """Get a response from the Google Gemini AI model."""
+async def get_gemini_response_async(input_text, pdf_content, prompt):
+    """Get a response from the Google Gemini AI model asynchronously."""
     try:
         model = genai.GenerativeModel('gemini-1.5-flash')
-        response = model.generate_content([input_text, pdf_content[0], prompt])
+        response = await asyncio.to_thread(model.generate_content, [input_text, pdf_content[0], prompt])
         return response.candidates[0].content.parts[0].text
     except (KeyError, IndexError, AttributeError) as e:
         st.error(f"Error generating response: {e}")
         return "No text generated"
 
 def handle_submission(uploaded_file, input_text, input_prompt):
-    """Handle the submission process for analyzing resumes."""
+    """Handle the submission process for analyzing resumes asynchronously."""
     if uploaded_file is not None:
         try:
             pdf_content = input_pdf_setup(uploaded_file)
-            response = get_gemini_response(input_text, pdf_content, input_prompt)
+            progress_bar = st.progress(0)
+            analysis_time_start = time.time()
+
+            response = asyncio.run(get_gemini_response_async(input_text, pdf_content, input_prompt))
+
             st.session_state.response = response  # Store the response in session state
             st.session_state.message = ('success', "Resume analyzed successfully!")
-            st.session_state.message_time = time.time()  # Store the current time
+            st.session_state.message_time = time.time()
+
+            # Update progress bar
+            progress_bar.progress(100)
+
+            # Track total time spent and resume count
+            analysis_time_end = time.time()
+            st.session_state.total_analysis_time += (analysis_time_end - analysis_time_start)
+            st.session_state.resume_count += 1
+
         except Exception as e:
             st.session_state.response = None
             st.session_state.message = ('error', f"An error occurred: {e}")
@@ -115,6 +141,17 @@ def create_button_grid(layout, uploaded_file, input_text):
             with col:
                 if st.button(label):
                     handle_submission(uploaded_file, input_text, label)
+
+def export_result_as_text():
+    """Allow the user to export the analysis result as a text file."""
+    if st.session_state.response:
+        result_text = st.session_state.response
+        st.download_button(
+            label="Download Analysis as Text",
+            data=result_text.encode(),
+            file_name="resume_analysis.txt",
+            mime="text/plain"
+        )
 
 # Load assets and profile image
 load_assets()
@@ -148,51 +185,42 @@ with st.sidebar:
 
     selected = option_menu(
         menu_title="Main Menu",
-        options=["Home", "chatBot", "Contact"],
-        icons=["house", "robot", "envelope"],
+        options=["Home", "chatBot", "Analytics", "Contact"],
+        icons=["house", "robot", "bar-chart", "envelope"],
         menu_icon="cast",
         default_index=0,
         key="main_menu"
     )
 
 # Main Page Rendering
-
-# Home Page
 if selected == "Home":
     st.markdown('<a name="home"></a>', unsafe_allow_html=True)
 
     genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
-    # Typed.js integration for the typing animation
+    # Typed.js integration for the typing animation on the Home page
     typing_animation = """
     <style>
-        body {
-            background-color: #0E1117; 
-            height: 100vh;
+        .center-typed {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
-            overflow: hidden;
+            height: 100px;
+            margin-top: 20px;
         }
-
-        h1 {
-            font-size: 2.11rem;
-            font-weight: 615;
-            line-height: 1.22;
+        .typed-text {
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: #0ef;
             text-align: center;
-            color: rgba(14, 239, 239, 0.8);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
         }
     </style>
 
+    <div class="center-typed">
+        <span id="typed-text" class="typed-text"></span>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11"></script>
-    <h1>
-        <span id="typed-text"></span>
-    </h1>
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         new Typed('#typed-text', {
@@ -207,7 +235,10 @@ if selected == "Home":
     """
     st.components.v1.html(typing_animation, height=150)
 
-    load_external_css(os.path.join('Assets', 'style.css'))
+    load_external_css(os.path.join('Assets', 'style.css'))  # Load the separate new features CSS file
+
+    # Reduced space between Typed.js animation and Select Role
+    st.markdown("<div style='margin-top: -20px;'></div>", unsafe_allow_html=True)
 
     # User role selection
     user_type = st.selectbox("Select your role", ["Select Role", "Recruiter", "Job Seeker"])
@@ -259,15 +290,14 @@ if selected == "Home":
         
         # Custom layout based on your requirements
         layout = [
-            ["Tell Me About the Resume", "Percentage Match", "Missing Keywords", "Role Fit Suggestions"],  # First row
-            ["Actionable Feedback for Improvement", "Achievement-Based Suggestions", "Resume Tailoring Suggestions"],  # Second row
-            ["Resume Length Optimization", "Job Fit Score", "Cover Letter Generation", "Career Growth Potential"]  # Third row
+            ["Tell Me About the Resume", "Percentage Match", "Missing Keywords", "Role Fit Suggestions"],
+            ["Actionable Feedback for Improvement", "Achievement-Based Suggestions", "Resume Tailoring Suggestions"],
+            ["Resume Length Optimization", "Job Fit Score", "Cover Letter Generation", "Career Growth Potential"]
         ]
         create_button_grid(layout, uploaded_file, input_text)
 
     else:
-        st.info("Please select either 'Recruiter' or 'Job Seeker' to view the prompts.")
-
+        st.info("Please select Role to view the Suggestions.")
 
     # Display the response after all buttons
     if st.session_state.response:
@@ -291,13 +321,12 @@ if selected == "Home":
             message_placeholder.empty()
             st.session_state.message = None
 
-    # Search bar query handling
-    query = search_bar()
-    if query:
-        response = process_query(query, input_text, uploaded_file)
-        st.write(f"Your query: {query}")
-        st.write("Processing your query...")
-        st.write(response)
+# Analytics Page
+elif selected == "Analytics":
+    st.title("Analytics Dashboard")
+    st.markdown(f"**Resumes Analyzed**: {st.session_state.resume_count}")
+    st.markdown(f"**Total Time Spent**: {round(st.session_state.total_analysis_time, 2)} seconds")
+    st.markdown("This section shows how many resumes you’ve analyzed and how much time has been spent on the analysis.")
 
 # chatBot Page
 elif selected == "chatBot":

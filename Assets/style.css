@@ -234,28 +234,3 @@
     font-size: 1.2rem; /* Adjust icon size */
     color: #323946;
 }
-
-.field.error .item {
-    border-color: #d93025;
-    color: #d93025;
-}
-
-.field .error-text {
-    font-size: 14.5px;
-    color: #d93025;
-    text-align: left;
-    margin: -5px 0 10px;
-    display: none;
-}
-
-.field.error .error-text {
-    display: block;
-}
-
-form .textarea-field .item {
-    resize: none;
-}
-
-form .textarea-field .error-text {
-    margin-top: -10px;
-}
