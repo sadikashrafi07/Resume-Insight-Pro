@@ -303,6 +303,9 @@ if selected == "Home":
     if st.session_state.response:
         st.subheader("The Response is")
         st.write(st.session_state.response)
+        
+        # Provide option to download the response as a text file
+        export_result_as_text()
 
     # Display the message if available and clear it after 3 seconds
     if st.session_state.message:
