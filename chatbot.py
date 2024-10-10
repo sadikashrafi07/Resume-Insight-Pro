@@ -121,17 +121,27 @@ def chatBot():
             st.session_state.messages.append({'role': 'assistant', "content": response})
             st.chat_message("assistant").write(response)
 
+        # **Show Clear Chat History button in the sidebar** only after messages appear
+        if "messages" in st.session_state and len(st.session_state["messages"]) > 1:  # Ensure there's user interaction
+            st.sidebar.button("Clear Chat History", on_click=lambda: st.session_state.update({"messages": [], "selected_topic": None}))
+
     # Display logic for Programming
     elif category == "Programming":
         # Input for programming task (coding prompt)
         prompt = st.text_area("Enter your coding prompt:", key="code_prompt")
 
+        # Generate Code Button
         if st.button("Generate Code"):
             if prompt:
                 # Generate code using Code Llama logic from programming.py
                 response = handle_programming_task(language, prompt)
                 st.write(f"**Generated Code for {language}:**")
                 st.code(response, language=language.lower())  # Display the generated code with formatting
+
+                # After output, show the Clear Chat History button below the output
+                st.markdown("<br>", unsafe_allow_html=True)  # Add space after the output
+                if st.button("Clear Chat History"):
+                    st.session_state["messages"] = []  # Clear the message history
             else:
                 st.warning("Please enter a prompt to generate code.")
 
