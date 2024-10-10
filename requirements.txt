@@ -11,3 +11,4 @@ langchain-huggingface
 huggingface_hub
 PyPDF2
 gradio
+ollama

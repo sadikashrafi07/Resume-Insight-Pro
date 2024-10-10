@@ -20,7 +20,7 @@ def run_code_llama(language, prompt):
 
     # Data payload for the API
     data = {
-        "model": "codeguru",  # API model name
+        "model": "LinguaLogic",  # API model name
         "prompt": final_prompt,
         "stream": False
     }
