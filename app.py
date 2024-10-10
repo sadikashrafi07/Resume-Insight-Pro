@@ -1,5 +1,6 @@
 import streamlit as st
 from chatbot import chatBot
+from Analytics import analytics_page
 from streamlit_option_menu import option_menu
 from dotenv import load_dotenv
 import base64
@@ -47,7 +48,6 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Utility Functions
-
 def load_profile_image(image_path):
     """Load a profile image and return it as a base64 encoded string."""
     try:
@@ -102,15 +102,19 @@ async def get_gemini_response_async(input_text, pdf_content, prompt):
         st.error(f"Error generating response: {e}")
         return "No text generated"
 
-def handle_submission(uploaded_file, input_text, input_prompt):
+async def handle_submission(uploaded_file, input_text, input_prompt):
     """Handle the submission process for analyzing resumes asynchronously."""
     if uploaded_file is not None:
+        if not input_text:
+            st.warning("Please provide a job description for analysis.")
+            return
         try:
             pdf_content = input_pdf_setup(uploaded_file)
             progress_bar = st.progress(0)
             analysis_time_start = time.time()
 
-            response = asyncio.run(get_gemini_response_async(input_text, pdf_content, input_prompt))
+            # Awaiting task directly (no need for asyncio.run inside an async function)
+            response = await get_gemini_response_async(input_text, pdf_content, input_prompt)
 
             st.session_state.response = response  # Store the response in session state
             st.session_state.message = ('success', "Resume analyzed successfully!")
@@ -124,6 +128,14 @@ def handle_submission(uploaded_file, input_text, input_prompt):
             st.session_state.total_analysis_time += (analysis_time_end - analysis_time_start)
             st.session_state.resume_count += 1
 
+            # Update chatbot queries count
+            if 'chatbot_queries' not in st.session_state:
+                st.session_state.chatbot_queries = 0
+            st.session_state.chatbot_queries += 1
+
+            # Save updated session state to file
+            save_session_data()
+
         except Exception as e:
             st.session_state.response = None
             st.session_state.message = ('error', f"An error occurred: {e}")
@@ -133,6 +145,21 @@ def handle_submission(uploaded_file, input_text, input_prompt):
         st.session_state.message = ('warning', "Please upload the resume")
         st.session_state.message_time = time.time()
 
+def save_session_data():
+    """Save session state data to a JSON file for persistence."""
+    try:
+        data = {
+            "chatbot_queries": st.session_state.get('chatbot_queries', 0),
+            "code_prompts": st.session_state.get('code_prompts', 0),
+            "total_chatbot_time": st.session_state.get('total_chatbot_time', 0.0),
+            "total_code_time": st.session_state.get('total_code_time', 0.0),
+            "response_times": st.session_state.get('response_times', [])
+        }
+        with open("session_data.json", "w") as f:
+            json.dump(data, f)
+    except Exception as e:
+        st.error(f"Error saving session data: {e}")
+
 def create_button_grid(layout, uploaded_file, input_text):
     """Dynamically create a grid of buttons based on the provided layout."""
     for row_layout in layout:
@@ -140,7 +167,7 @@ def create_button_grid(layout, uploaded_file, input_text):
         for col, label in zip(cols, row_layout):
             with col:
                 if st.button(label):
-                    handle_submission(uploaded_file, input_text, label)
+                    asyncio.run(handle_submission(uploaded_file, input_text, label))
 
 def export_result_as_text():
     """Allow the user to export the analysis result as a text file."""
@@ -235,7 +262,7 @@ if selected == "Home":
     """
     st.components.v1.html(typing_animation, height=150)
 
-    load_external_css(os.path.join('Assets', 'style.css'))  # Load the separate new features CSS file
+    load_external_css(os.path.join('Assets', 'style.css'))
 
     # Reduced space between Typed.js animation and Select Role
     st.markdown("<div style='margin-top: -20px;'></div>", unsafe_allow_html=True)
@@ -326,10 +353,7 @@ if selected == "Home":
 
 # Analytics Page
 elif selected == "Analytics":
-    st.title("Analytics Dashboard")
-    st.markdown(f"**Resumes Analyzed**: {st.session_state.resume_count}")
-    st.markdown(f"**Total Time Spent**: {round(st.session_state.total_analysis_time, 2)} seconds")
-    st.markdown("This section shows how many resumes you’ve analyzed and how much time has been spent on the analysis.")
+    analytics_page()
 
 # chatBot Page
 elif selected == "chatBot":

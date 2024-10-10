@@ -12,3 +12,6 @@ huggingface_hub
 PyPDF2
 gradio
 ollama
+plotly
+pandas
+Matplotlib

@@ -1,6 +1,7 @@
 import streamlit as st
 from crewai import Crew, Process
 import asyncio
+import time
 from programming import run_code_llama  # Import programming model logic
 
 # Dynamically load agents and tasks
@@ -37,7 +38,16 @@ def create_interview_crew(selected_topic):
 # Async function to kick off the interview preparation process
 async def prepare_interview_async(crew, topic):
     try:
-        result = await asyncio.to_thread(crew.kickoff, inputs={'topic': topic})
+        start_time = time.time()  # Start timer
+        # Run the crew kickoff asynchronously
+        result = await asyncio.to_thread(crew.kickoff, inputs={'topic': topic})  # Use to_thread for async task
+        end_time = time.time()  # End timer
+
+        # Update session state with response time
+        response_time = round(end_time - start_time, 2)
+        st.session_state.response_times.append(response_time)
+        st.session_state.total_chatbot_time += response_time
+
         return result
     except Exception as e:
         return f"Error during preparation: {str(e)}"
@@ -52,6 +62,14 @@ def chatBot():
 
     # Info message
     info_message = "ℹ️ Please select a category to proceed: Interview Preparation or Programming."
+
+    # Initialize session state for response times, chatbot time, and chatbot query tracking
+    if 'response_times' not in st.session_state:
+        st.session_state.response_times = []
+    if 'total_chatbot_time' not in st.session_state:
+        st.session_state.total_chatbot_time = 0
+    if 'chatbot_queries' not in st.session_state:
+        st.session_state.chatbot_queries = 0  # Track the number of chatbot queries
 
     # Create a background "bar" container to hold the dropdowns
     with st.container():
@@ -110,14 +128,20 @@ def chatBot():
             st.session_state.messages.append({"role": "user", "content": prompt})
             st.chat_message("user").write(prompt)
 
+            # Track the chatbot query count
+            st.session_state.chatbot_queries += 1
+
             # Prepare the interview using the selected topic's crew
             interview_crew = create_interview_crew(selected_topic)
 
             # Display a progress spinner while processing the response
             with st.spinner("Preparing response..."):
+                # Use asyncio.run() in this synchronous context
                 response = asyncio.run(prepare_interview_async(interview_crew, selected_topic))
 
             # Append the assistant's response and display it
+            if response is None:
+                response = "Sorry, no valid response was generated. Please try again."
             st.session_state.messages.append({'role': 'assistant', "content": response})
             st.chat_message("assistant").write(response)
 
