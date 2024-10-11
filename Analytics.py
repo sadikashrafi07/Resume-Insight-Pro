@@ -6,7 +6,7 @@ import json
 import os
 
 def analytics_page():
-    # Custom CSS for professional styling
+    # Custom CSS for professional styling and consistent layout
     st.markdown("""
         <style>
         .reportview-container {
@@ -19,13 +19,13 @@ def analytics_page():
         }
         h1, h2, h3, h4 {
             color: #d4d4dc;
-            text-align: center;
+            text-align: left;  /* Adjusted alignment */
         }
         .metric-container {
             background-color: #1f2e3d;
             border-radius: 10px;
             padding: 10px;
-            text-align: center;
+            text-align: left;  /* Ensure consistency */
             margin-bottom: 10px;
         }
         .metric-container div {
@@ -73,7 +73,6 @@ def analytics_page():
         except Exception as e:
             st.error(f"Error loading session data: {e}")
 
-
     # Load session data at the start
     load_session_data()
 
@@ -81,7 +80,6 @@ def analytics_page():
     st.markdown("<h1>📊 Professional Analytics Dashboard</h1>", unsafe_allow_html=True)
 
     # --- Data for Analytics ---
-    # Check if there is data available, and handle the case when it's empty
     if (st.session_state.chatbot_queries == 0 and 
         st.session_state.code_prompts == 0 and 
         st.session_state.total_chatbot_time == 0 and 

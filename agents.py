@@ -1,7 +1,8 @@
+import os
 from crewai import Agent
 from tools import reactjs_tool, angular_tool, javascript_tool, vuejs_tool, fullstack_tool, datascience_tool
 from dotenv import load_dotenv
-from langchain_groq import ChatGroq
+
 
 
 
@@ -9,9 +10,8 @@ from langchain_groq import ChatGroq
 load_dotenv()
 
 # Set up Hugging Face token from environment variables
-import os
-groq_api_key=os.getenv("GROQ_API_KEY")
-model=ChatGroq(model="Gemma2-9b-It",groq_api_key=groq_api_key)
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["OPENAI_MODEL_NAME"]="gpt-4-0125-preview"
 
 
 

@@ -6,7 +6,40 @@ import time
 
 # API endpoint for code generation
 url = os.getenv("API_URL")
+
 headers = {'Content-Type': 'application/json'}
+
+# Function to load session data
+def load_session_data():
+    """Load session state data from a JSON file, or initialize a new session state."""
+    if os.path.exists("session_data.json"):
+        try:
+            with open("session_data.json", "r") as f:
+                data = json.load(f)
+                # Load session state from file
+                st.session_state.chatbot_queries = data.get("chatbot_queries", 0)
+                st.session_state.code_prompts = data.get("code_prompts", 0)
+                st.session_state.total_chatbot_time = data.get("total_chatbot_time", 0.0)
+                st.session_state.total_code_time = data.get("total_code_time", 0.0)
+                st.session_state.response_times = data.get("response_times", [])
+        except (json.JSONDecodeError, FileNotFoundError):
+            st.error("Error loading session data: Invalid or missing JSON file.")
+            # Initialize session state if the file is invalid
+            st.session_state.chatbot_queries = 0
+            st.session_state.code_prompts = 0
+            st.session_state.total_chatbot_time = 0.0
+            st.session_state.total_code_time = 0.0
+            st.session_state.response_times = []
+    else:
+        # Initialize session state if the file does not exist
+        st.session_state.chatbot_queries = 0
+        st.session_state.code_prompts = 0
+        st.session_state.total_chatbot_time = 0.0
+        st.session_state.total_code_time = 0.0
+        st.session_state.response_times = []
+
+# Call the function when loading the Streamlit app
+load_session_data()
 
 # Function to generate a response from the API with retry logic
 def run_code_llama(language, prompt):
@@ -34,8 +67,8 @@ def run_code_llama(language, prompt):
         "stream": False
     }
 
-    retry_attempts = 3  # Number of retries if the request times out
-    timeout_duration = 30  # Increase timeout to 30 seconds
+    retry_attempts = 20 # Number of retries if the request times out
+    timeout_duration = 60  # Increase timeout to 30 seconds
 
     for attempt in range(retry_attempts):
         try:
@@ -121,7 +154,7 @@ def code_generation_interface():
         st.session_state.history = []
         st.session_state.response_times = []
         st.session_state.total_code_time = 0
-        st.success("History cleared!")  # Notify the user that history was cleared
+        st.success("Session history cleared!")  # Notify the user that history was cleared
 
 # Launch the Streamlit interface if running this script directly
 if __name__ == "__main__":
