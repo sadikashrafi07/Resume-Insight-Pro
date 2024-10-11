@@ -364,18 +364,21 @@ elif selected == "Contact":
     if st.session_state.get("form_submitted", False):
         st.success("Thank you! Your message has been sent.")
     else:
-        st.markdown("""
+        # Load the Web3Forms access key from the environment variable
+        web3forms_access_key = os.getenv("WEB3FORMS_ACCESS_KEY")
+
+        st.markdown(f"""
         <section class="contact" id="contact">
             <h2 class="heading">Contact <span>Me!</span></h2>
             <form action="https://api.web3forms.com/submit" method="POST">
                 <div class="input-box">
-                    <input type="hidden" name="access_key" value="5c2d90d6-d1f2-4b74-b71e-1ce3865cc603">
+                    <input type="hidden" name="access_key" value="{web3forms_access_key}">
                     <input type="hidden" name="_captcha" value="False">
                     <input type="text" name="name" class="item" placeholder="Full Name" required>
                     <input type="email" name="email" class="item" placeholder="Email Address" required>
                 </div>
                 <div class="input-box">
-                    <input type="text" name="phone" id="phone" class="item" placeholder="Mobile Number" pattern="\\d{10}" title="Please enter valid Phone number" required>
+                    <input type="text" name="phone" id="phone" class="item" placeholder="Mobile Number" pattern="\\d{{10}}" title="Please enter a valid Phone number" required>
                     <input type="text" name="subject" class="item" placeholder="Email Subject" required>
                 </div>
                 <textarea name="message" class="item textarea-field" cols="30" rows="5" placeholder="Your Message" required></textarea>

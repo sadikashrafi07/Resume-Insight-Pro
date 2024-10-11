@@ -5,7 +5,7 @@ import json
 import time
 
 # API endpoint for code generation
-url = os.getenv("API_URL", "http://localhost:11434/api/generate")
+url = os.getenv("API_URL")
 headers = {'Content-Type': 'application/json'}
 
 # Function to generate a response from the API with retry logic
