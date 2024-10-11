@@ -1,2 +1,13 @@
-.env
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.env
+session_data.json
+
+# OS specific
+.DS_Store
+
+# Logs
+*.log
 
