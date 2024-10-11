@@ -7,14 +7,26 @@ import base64
 import os
 import io
 from PIL import Image
+from pathlib import Path
 import pdf2image
 import google.generativeai as genai
 import time
 import asyncio
 import logging
 
-# Streamlit App configuration
-st.set_page_config(page_title="ATS Resume Expert", layout="wide")
+# Set page configuration with a page icon loaded from a file or fallback to an emoji
+page_icon_path = Path("images/Icon.webp")
+
+# Try to read the icon file, fallback to an emoji if file is not found
+try:
+    with open(page_icon_path, "rb") as f:
+        page_icon = f.read()
+except FileNotFoundError:
+    page_icon = "📮"  # Fallback emoji if the icon is not found
+
+st.set_page_config(page_title="Resume Insight Pro", page_icon=page_icon,layout="wide"
+)
+
 
 # Initialize session state
 if 'submit_contact_form' not in st.session_state:
