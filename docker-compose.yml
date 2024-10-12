@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  resume-insight-pro:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - WEB3FORMS_ACCESS_KEY=${WEB3FORMS_ACCESS_KEY}
+      - API_URL=http://ollama:11434/api/generate  # Updated API URL
+    volumes:
+      - .:/app  # Mount the project directory to the container
+    depends_on:
+      - ollama  # Ensure ollama service starts first
+    container_name: resume-insight-pro-container
+
+  ollama:
+    image: ollama/ollama:latest  # Ollama service image
+    ports:
+      - "11434:11434"  # Expose API port for ollama
+    container_name: ollama-container
+    volumes:
+      - ~/.ollama/models:/root/.ollama/models  # Mount the models directory from the host to the container
+    deploy:
+      resources:
+        limits:
+          memory: 12G  # Set memory limit for the Ollama service
+        reservations:
+          memory: 8G  # Reserved memory for Ollama service
+    environment:
+      - OLLAMA_MAX_MEMORY=12G  # Set max memory available to Ollama
+      - BATCH_SIZE=256  # Reduce batch size to lower memory usage
+      - CONTEXT_SIZE=4096  # Reduce context size for lower memory footprint
