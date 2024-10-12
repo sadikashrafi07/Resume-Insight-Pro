@@ -13,23 +13,28 @@ services:
     volumes:
       - .:/app  # Mount the project directory to the container
     depends_on:
-      - ollama  # Ensure ollama service starts first
+      - ollama  # Ensure Ollama service starts first
     container_name: resume-insight-pro-container
+    deploy:
+      resources:
+        limits:
+          cpus: '2'  # Adjust the CPU allocation for better control in Cloud Run
+          memory: 4G  # Limit memory to a reasonable value for Cloud Run
 
   ollama:
     image: ollama/ollama:latest  # Ollama service image
     ports:
-      - "11434:11434"  # Expose API port for ollama
+      - "11434:11434"  # Expose API port for Ollama
     container_name: ollama-container
     volumes:
       - ~/.ollama/models:/root/.ollama/models  # Mount the models directory from the host to the container
     deploy:
       resources:
         limits:
-          memory: 12G  # Set memory limit for the Ollama service
+          memory: 8G  # Set memory limit for the Ollama service to match Cloud Run capabilities
         reservations:
-          memory: 8G  # Reserved memory for Ollama service
+          memory: 4G  # Reserved memory for Ollama service
     environment:
-      - OLLAMA_MAX_MEMORY=12G  # Set max memory available to Ollama
-      - BATCH_SIZE=256  # Reduce batch size to lower memory usage
-      - CONTEXT_SIZE=4096  # Reduce context size for lower memory footprint
+      - OLLAMA_MAX_MEMORY=8G  # Adjusted to 8GB for Google Cloud Run's capabilities
+      - BATCH_SIZE=128  # Lower the batch size to manage resource load on Cloud Run
+      - CONTEXT_SIZE=2048  # Further reduce context size to lower memory footprint

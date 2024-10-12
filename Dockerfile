@@ -1,22 +1,37 @@
-# Use Python 3.10 (or Python 3.11 if needed)
-FROM python:3.10-slim
+# Stage 1: Build Stage
+FROM python:3.10-slim as builder
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Upgrade pip
-RUN pip install --upgrade pip
-
-# Install dependencies for PDF processing (Poppler)
-RUN apt-get update && apt-get install -y poppler-utils
-
-# Copy the requirements.txt file into the container
-COPY requirements.txt /app/
+# Install system dependencies for PDF processing and build essentials
+RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends \
+    build-essential \
+    poppler-utils \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt /app/
+RUN pip install --user --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application into the container
+# Stage 2: Production Stage
+FROM python:3.10-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies for PDF processing (only poppler-utils needed here)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    poppler-utils \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copy installed Python packages from the builder stage
+COPY --from=builder /root/.local /root/.local
+
+# Ensure that Python uses the installed packages from /root/.local
+ENV PATH=/root/.local/bin:$PATH
+
+# Copy the app code into the container
 COPY . /app/
 
 # Expose the port Streamlit runs on

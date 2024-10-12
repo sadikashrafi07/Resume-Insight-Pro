@@ -77,7 +77,7 @@ def analytics_page():
     load_session_data()
 
     # --- Dashboard Header ---
-    st.markdown("<h1>📊 Professional Analytics Dashboard</h1>", unsafe_allow_html=True)
+    st.markdown("<h1>📊 Analytics Dashboard</h1>", unsafe_allow_html=True)
 
     # --- Data for Analytics ---
     if (st.session_state.chatbot_queries == 0 and 
