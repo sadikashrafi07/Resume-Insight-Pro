@@ -1,0 +1,27 @@
+version: '3'
+services:
+  resume-insight-app:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - WEB3FORMS_ACCESS_KEY=${WEB3FORMS_ACCESS_KEY}
+      - API_URL=${API_URL}
+    env_file:
+      - .env
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/var/lib/ollama
+    command: ollama serve
+    ports:
+      - "11434:11434"  # API exposed to your app
+  
+volumes:
+  ollama_data:
+    driver: local
