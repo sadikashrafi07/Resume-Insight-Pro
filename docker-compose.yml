@@ -13,6 +13,7 @@ services:
       - API_URL=${API_URL}
     env_file:
       - .env
+    restart: always
 
   ollama:
     image: ollama/ollama:latest
