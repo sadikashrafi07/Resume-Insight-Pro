@@ -3,14 +3,21 @@ __pycache__/
 *.py[cod]
 
 # Ignore environment variable files and sensitive data
-*.env
-session_data.json
+.env
 
-# Ignore system files
+# Ignore Git-related files
+.git
+.gitignore
+
+# Ignore unnecessary config files
+LICENSE
+Modelfile  # Add only if you don't want it in the container
+
+# Ignore Streamlit config (optional)
+.streamlit/config.toml
+
+# Ignore OS specific files
 .DS_Store
 
 # Ignore logs
 *.log
-
-# Ignore git files
-.git
