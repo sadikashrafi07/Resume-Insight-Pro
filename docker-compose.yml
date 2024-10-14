@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - ollama
+    restart: unless-stopped  # Ensure the app restarts if it crashes
+    healthcheck:  # Optional: Add a health check to make sure app is healthy
+      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+
+  ollama:
+    image: ollama/ollama:latest
+    environment:
+      - API_KEY=${OPENAI_API_KEY}  # Use correct API key for Ollama if needed
+    volumes:
+      - ./Modelfile:/app/Modelfile  # Ensure this path is correct
+    ports:
+      - "11434:11434"
+    restart: unless-stopped  # Restart if the service crashes
+    healthcheck:  # Optional: Health check for Ollama service
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
