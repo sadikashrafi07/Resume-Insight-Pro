@@ -23,6 +23,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the entire project files into the container
 COPY . .
 
+# Ensure the .streamlit folder is copied for theme settings
+COPY .streamlit /app/.streamlit
+
 # Expose the port Streamlit will run on
 EXPOSE 8501
 
