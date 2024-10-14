@@ -5,7 +5,7 @@ Pillow
 pdf2image
 google-generativeai
 crewai
-crewai_tools
+crewai[tools]
 load_dotenv
 langchain-huggingface
 huggingface_hub
