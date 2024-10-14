@@ -16,7 +16,7 @@ import asyncio
 import logging
 
 # Set page configuration with a page icon loaded from a file or fallback to an emoji
-page_icon_path = Path("images/Icon.webp")
+page_icon_path = Path("Images/Icon.webp")
 
 # Try to read the icon file, fallback to an emoji if file is not found
 try:

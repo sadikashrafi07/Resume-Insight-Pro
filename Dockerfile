@@ -26,15 +26,14 @@ COPY . .
 # Ensure the .streamlit folder is copied for theme settings
 COPY .streamlit /app/.streamlit
 
+# Copy the images folder into the container
+COPY Images /app/Images
+
+
 # Expose the port Streamlit will run on
 EXPOSE 8501
 
-# Set environment variables (these should be passed as secrets in production)
-ENV OPENAI_API_KEY=${OPENAI_API_KEY}
-ENV GOOGLE_API_KEY=${GOOGLE_API_KEY}
-ENV WEB3FORMS_ACCESS_KEY=${WEB3FORMS_ACCESS_KEY}
-ENV API_URL=${API_URL}
 
-# Command to run the Streamlit app
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.enableCORS=false", "--server.headless=true"]
+# Running our Streamlit app when the container starts
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
