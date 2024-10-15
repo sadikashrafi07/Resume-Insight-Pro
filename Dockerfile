@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
     poppler-utils \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Ollama for the LinguaLogic model (assuming it is supported in this environment)
