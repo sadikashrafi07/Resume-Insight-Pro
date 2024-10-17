@@ -12,25 +12,34 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - ollama
+      ollama:
+        condition: service_healthy  # Ensure 'app' waits until 'ollama' is healthy
     restart: unless-stopped  # Ensure the app restarts if it crashes
-    healthcheck:  # Optional: Add a health check to make sure app is healthy
+    healthcheck:  # Health check for the 'app' service
       test: ["CMD", "curl", "-f", "http://localhost:8501"]
       interval: 1m
       timeout: 10s
       retries: 3
+    networks:
+      - app-network  # Ensure services are on the same network
 
   ollama:
     image: ollama/ollama:latest
     environment:
-      - API_KEY=${OPENAI_API_KEY}  # Use correct API key for Ollama if needed
+      - API_KEY=${OPENAI_API_KEY}  # Use the correct API key for Ollama
     volumes:
       - ./Modelfile:/app/Modelfile  # Ensure this path is correct
     ports:
       - "11434:11434"
     restart: unless-stopped  # Restart if the service crashes
-    healthcheck:  # Optional: Health check for Ollama service
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+    healthcheck:  # Health check for the 'ollama' service
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/generate"]
       interval: 1m
       timeout: 10s
       retries: 3
+    networks:
+      - app-network  # Same network for communication
+
+networks:
+  app-network:
+    driver: bridge
