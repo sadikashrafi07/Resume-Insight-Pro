@@ -1,13 +1,12 @@
 import os
 import streamlit as st
-import requests
 import json
 import aiohttp
 import asyncio
 import time
 
 # API endpoint for code generation
-url = os.getenv("API_URL")
+url = os.getenv("API_URL", "http://13.235.69.82:11434/api/generate")
 
 headers = {'Content-Type': 'application/json'}
 
@@ -137,11 +136,9 @@ def code_generation_interface():
             st.warning("Please enter a more detailed prompt (at least 10 characters).")
             return
 
-        # Create an event loop if one doesn't exist
+        # Use asyncio.create_task to schedule the async function
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-
-        # Generate the response by calling the API
         response = loop.run_until_complete(run_code_llama(language, prompt))
 
         # Display the generated code with syntax highlighting
