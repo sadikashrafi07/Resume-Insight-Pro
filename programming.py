@@ -137,8 +137,12 @@ def code_generation_interface():
             st.warning("Please enter a more detailed prompt (at least 10 characters).")
             return
 
+        # Create an event loop if one doesn't exist
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
         # Generate the response by calling the API
-        response = asyncio.run(run_code_llama(language, prompt))  
+        response = loop.run_until_complete(run_code_llama(language, prompt))
 
         # Display the generated code with syntax highlighting
         st.write(f"### Generated Code for {language}:")
