@@ -2,6 +2,8 @@ import os
 import streamlit as st
 import requests
 import json
+import aiohttp
+import asyncio
 import time
 
 # API endpoint for code generation
@@ -41,9 +43,9 @@ def load_session_data():
 # Call the function when loading the Streamlit app
 load_session_data()
 
-# Function to generate a response from the API with retry logic
-def run_code_llama(language, prompt):
-    # Initialize session state variables if needed
+# Asynchronous function to generate a response from the API
+async def run_code_llama(language, prompt):
+    # Initialize session state variables
     if 'history' not in st.session_state:
         st.session_state.history = []
     if 'response_times' not in st.session_state:
@@ -60,53 +62,47 @@ def run_code_llama(language, prompt):
     
     final_prompt = f"Language: {language}\n" + "\n".join(st.session_state.history)
 
-    # Prepare the data payload for the API
     data = {
-        "model": "LinguaLogic",  # API model name
+        "model": "LinguaLogic",
         "prompt": final_prompt,
         "stream": False
     }
 
-    retry_attempts = 20 # Number of retries if the request times out
-    timeout_duration = 60  # Increase timeout to 30 seconds
+    retry_attempts = 5
+    timeout_duration = 120  # Increase timeout to 2 minutes
 
     for attempt in range(retry_attempts):
         try:
-            start_time = time.time()  # Start timer
+            start_time = time.time()  # Initialize start time here
 
-            # Make the request to the API with a timeout
-            response = requests.post(url, headers=headers, data=json.dumps(data), timeout=timeout_duration)
-            response.raise_for_status()  # Raise an exception for any non-200 status
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, json=data, timeout=timeout_duration) as response:
+                    response.raise_for_status()  # Raise error for non-2xx statuses
+                    
+                    response_data = await response.json()
 
-            # Extract the response
-            response_data = response.json()
+                    end_time = time.time()  # End timer
+                    response_time = round(end_time - start_time, 2)
 
-            end_time = time.time()  # End timer
-            response_time = round(end_time - start_time, 2)
+                    # Update session state with timing data
+                    st.session_state.response_times.append(response_time)
+                    st.session_state.total_code_time += response_time
+                    st.session_state.code_prompts += 1
 
-            # Update session state with timing data
-            st.session_state.response_times.append(response_time)
-            st.session_state.total_code_time += response_time
-            st.session_state.code_prompts += 1  # Update code prompts count
+                    save_session_data()
 
-            # Save updated session state to file
-            save_session_data()
+                    if 'response' in response_data:
+                        return response_data['response']
+                    else:
+                        return "Error: Invalid API response format."
 
-            # Return the generated code from the API response
-            if 'response' in response_data:
-                return response_data['response']
-            else:
-                return "Error: Invalid API response format."
-
-        except requests.exceptions.Timeout:
+        except aiohttp.ClientTimeout:
             st.warning(f"Request timed out, retrying {attempt + 1}/{retry_attempts}...")
-            time.sleep(5)  # Wait for 5 seconds before retrying
+            await asyncio.sleep(5)  # Wait before retrying
 
-        except requests.exceptions.RequestException as e:
-            # Return a detailed error message for any request failure
+        except aiohttp.ClientError as e:
             return f"API Error: {str(e)}"
 
-    # If all attempts fail
     return "API Error: Request timed out after multiple attempts."
 
 # Function to save session data
@@ -125,7 +121,7 @@ def save_session_data():
     except Exception as e:
         st.error(f"Error saving session data: {e}")
 
-# Optional: Streamlit interface for standalone testing
+# Streamlit interface for standalone testing
 def code_generation_interface():
     st.title("Code Generation with CodeGuru API")
 
@@ -140,9 +136,9 @@ def code_generation_interface():
         if not prompt or len(prompt.strip()) < 10:  # Minimum length check for prompt
             st.warning("Please enter a more detailed prompt (at least 10 characters).")
             return
-        
-        # Generate the response by calling the API
-        response = run_code_llama(language, prompt)
+
+        # Use asyncio.run to call the asynchronous function
+        response = asyncio.run(run_code_llama(language, prompt))
 
         # Display the generated code with syntax highlighting
         st.write(f"### Generated Code for {language}:")

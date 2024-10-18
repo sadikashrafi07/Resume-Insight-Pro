@@ -15,3 +15,4 @@ ollama
 plotly
 pandas
 Matplotlib
+aiohttp
