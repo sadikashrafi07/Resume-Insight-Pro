@@ -1,12 +1,11 @@
 import os
 import streamlit as st
 import json
-import aiohttp
-import asyncio
+import requests
 import time
 
 # API endpoint for code generation
-url = os.getenv("API_URL", "http://13.235.69.82:11434/api/generate")
+url = os.getenv("API_URL")
 
 headers = {'Content-Type': 'application/json'}
 
@@ -42,8 +41,8 @@ def load_session_data():
 # Call the function when loading the Streamlit app
 load_session_data()
 
-# Asynchronous function to generate a response from the API
-async def run_code_llama(language, prompt):
+# Synchronous function to generate a response from the API
+def run_code_llama(language, prompt):
     # Initialize session state variables
     if 'history' not in st.session_state:
         st.session_state.history = []
@@ -74,32 +73,31 @@ async def run_code_llama(language, prompt):
         try:
             start_time = time.time()  # Initialize start time here
 
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=data, timeout=timeout_duration) as response:
-                    response.raise_for_status()  # Raise error for non-2xx statuses
-                    
-                    response_data = await response.json()
+            response = requests.post(url, json=data, headers=headers, timeout=timeout_duration)
+            response.raise_for_status()  # Raise error for non-2xx statuses
 
-                    end_time = time.time()  # End timer
-                    response_time = round(end_time - start_time, 2)
+            response_data = response.json()
 
-                    # Update session state with timing data
-                    st.session_state.response_times.append(response_time)
-                    st.session_state.total_code_time += response_time
-                    st.session_state.code_prompts += 1
+            end_time = time.time()  # End timer
+            response_time = round(end_time - start_time, 2)
 
-                    save_session_data()
+            # Update session state with timing data
+            st.session_state.response_times.append(response_time)
+            st.session_state.total_code_time += response_time
+            st.session_state.code_prompts += 1
 
-                    if 'response' in response_data:
-                        return response_data['response']
-                    else:
-                        return "Error: Invalid API response format."
+            save_session_data()
 
-        except aiohttp.ClientTimeout:
+            if 'response' in response_data:
+                return response_data['response']
+            else:
+                return "Error: Invalid API response format."
+
+        except requests.Timeout:
             st.warning(f"Request timed out, retrying {attempt + 1}/{retry_attempts}...")
-            await asyncio.sleep(5)  # Wait before retrying
+            time.sleep(5)  # Wait before retrying
 
-        except aiohttp.ClientError as e:
+        except requests.RequestException as e:
             return f"API Error: {str(e)}"
 
     return "API Error: Request timed out after multiple attempts."
@@ -122,7 +120,7 @@ def save_session_data():
 
 # Streamlit interface for standalone testing
 def code_generation_interface():
-    st.title("Code Generation with CodeGuru API")
+    st.title("Code Generation with LinguaLogic API")
 
     # Text area for user to input a coding prompt
     prompt = st.text_area("Enter your coding prompt:", key="code_prompt")
@@ -136,14 +134,8 @@ def code_generation_interface():
             st.warning("Please enter a more detailed prompt (at least 10 characters).")
             return
 
-        # Use asyncio.create_task to schedule the async function
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        response = loop.run_until_complete(run_code_llama(language, prompt))
-
-        # Display the generated code with syntax highlighting
-        st.write(f"### Generated Code for {language}:")
-        st.code(response, language=language.lower())  # Adjust the language dynamically
+        response = run_code_llama(language, prompt)
+        st.code(response, language=language.lower())
 
     # Button to clear the history (reset conversation)
     if st.button("Clear History"):
