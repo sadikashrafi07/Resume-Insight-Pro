@@ -1,7 +1,7 @@
 
 # Resume Insight Pro
 
-**Live Link**: [Resume Insight Pro Demo](https://resume-insight-pro.streamlit.app/)
+**Live Link**: [Resume Insight Pro](https://resume-insight-pro.streamlit.app/)
 
 ## Overview
 
@@ -126,6 +126,22 @@ For more details on setting up the model and endpoints, refer to [Ollama API Doc
 
 4. **Real-Time Analytics**:
    - Monitor user interactions, including query count, code prompts, and response times, through the analytics dashboard.
+  
+## Feature Enhancements
+
+### Planned Features
+
+- **Search Bar with Query Support (RAG Application)**:  
+  The **Home page** currently provides useful suggestions for users. In the next enhancement, a **search bar** will be added, allowing users to input custom queries. This feature will leverage a **Retrieval-Augmented Generation (RAG)** system, maintaining conversation history and session state for a more dynamic, personalized experience.
+
+- **Interview Preparation Improvements**:  
+  The **Interview Preparation** section will soon feature a curated list of **useful questions** and **most-asked questions** across different technical domains. Additionally, learning resources and further suggestions will be included to make this section a more comprehensive preparation tool for users. Users will also be able to **prepare their own professional resumes** based on feedback and suggestions provided by the platform, helping them achieve their dream jobs. Furthermore, users can submit their resumes for **professional review** by industry experts or working professionals to get additional insights.
+
+- **Resume Optimization with AI**:  
+  A future enhancement will allow the platform to provide **AI-powered resume templates** and **dynamic resume-building tools**. Users will be able to choose from various templates based on their career level and industry, and the system will recommend improvements as they build their resumes, ensuring that their resumes meet the latest industry standards.
+
+- **Collaborative Resume Reviews**:  
+  Integrating a **collaborative review system** where users can share their resumes with peers, mentors, or professionals for feedback. This feature would facilitate multiple rounds of feedback, helping users refine their resumes iteratively.
 
 ## Feedback
 
