@@ -1,3 +1,8 @@
+import sys
+import pysqlite3  
+
+sys.modules['sqlite3'] = pysqlite3
+
 import streamlit as st
 from chatbot import chatBot
 from Analytics import analytics_page
@@ -25,34 +30,24 @@ try:
 except FileNotFoundError:
     page_icon = "📮"  # Fallback emoji if the icon is not found
 
-st.set_page_config(page_title="Resume Insight Pro", page_icon=page_icon,layout="wide"
-)
-
+st.set_page_config(page_title="Resume Insight Pro", page_icon=page_icon, layout="wide")
 
 # Initialize session state
-if 'submit_contact_form' not in st.session_state:
-    st.session_state.submit_contact_form = False
+session_state_defaults = {
+    'submit_contact_form': False,
+    'response': None,
+    'message': None,
+    'message_time': None,
+    'search_query': "",
+    'search_history': [],
+    'resume_count': 0,
+    'total_analysis_time': 0,
+    'chatbot_queries': 0
+}
 
-if 'response' not in st.session_state:
-    st.session_state.response = None
-
-if 'message' not in st.session_state:
-    st.session_state.message = None
-
-if 'message_time' not in st.session_state:
-    st.session_state.message_time = None
-
-if 'search_query' not in st.session_state:
-    st.session_state.search_query = ""
-
-if 'search_history' not in st.session_state:
-    st.session_state.search_history = []
-
-if 'resume_count' not in st.session_state:
-    st.session_state.resume_count = 0
-
-if 'total_analysis_time' not in st.session_state:
-    st.session_state.total_analysis_time = 0
+for key, default in session_state_defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = default
 
 # Load environment variables
 load_dotenv()
@@ -142,8 +137,6 @@ async def handle_submission(uploaded_file, input_text, input_prompt):
             st.session_state.resume_count += 1
 
             # Update chatbot queries count
-            if 'chatbot_queries' not in st.session_state:
-                st.session_state.chatbot_queries = 0
             st.session_state.chatbot_queries += 1
 
             # Save updated session state to file

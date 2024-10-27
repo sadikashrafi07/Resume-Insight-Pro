@@ -16,3 +16,4 @@ plotly
 pandas
 Matplotlib
 aiohttp
+pysqlite3-binary
