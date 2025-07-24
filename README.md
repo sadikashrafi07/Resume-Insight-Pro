@@ -2,10 +2,13 @@
 # Resume Insight Pro
 
 **Live Link**: [Resume Insight Pro](https://resume-insight-pro.streamlit.app/)
+**Demo Video**: [Watch Demo](https://drive.google.com/file/d/1qRmu5zwE6RggjRRsQfwkOKBCRIyR3gKR/view?usp=sharing)
 
 ## Overview
 
 **Resume Insight Pro** is a comprehensive tool designed for **job seekers** and **recruiters** to analyze and optimize resumes against job descriptions. It provides keyword suggestions, detailed feedback, and a search feature to query specific terms within resumes and job descriptions. The tool offers interactive support for interview preparation topics and coding problems.
+
+▶️ **[Watch the Demo Video](https://drive.google.com/file/d/1qRmu5zwE6RggjRRsQfwkOKBCRIyR3gKR/view?usp=sharing)** for a walkthrough of the platform's features and user experience.
 
 It leverages multiple AI models and services:
 - **CrewAI Multi-Agent system** and **GPT-4-0125-preview** for interview topic assistance.
