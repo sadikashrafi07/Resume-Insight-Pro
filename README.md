@@ -1,7 +1,7 @@
 
 # Resume Insight Pro
 
-**Live Link**: [Resume Insight Pro](https://resume-insight-pro.streamlit.app/)
+**Live Link**: [Resume Insight Pro](https://resume-insight-pro.streamlit.app/)    
 **Demo Video**: [Watch Demo](https://drive.google.com/file/d/1qRmu5zwE6RggjRRsQfwkOKBCRIyR3gKR/view?usp=sharing)
 
 ## Overview
